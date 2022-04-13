@@ -6,9 +6,16 @@ Feature: Gestão de pets
     Background: Base url
         Given url "https://petstore.swagger.io/v2"
         And path "pet"
-        * def petId = "131314" 
 
-    Scenario: Cadastrar um pet utilizando id
+    Scenario: Atualizar um pet utilizando id
+        * def payload = { id: 0, category: { id: 0, name: "string" }, name: "doggie", photoUrls: [], tags: [], status: "available" }
+        Given request payload
+        When method post
+        Then status 200
+        * def petId = response.id
+        * print petId
+
+        Given path "pet"
         And path petId
         # And path "131313" 
         And form field name = "Cachorro Caramelo" 
@@ -16,7 +23,9 @@ Feature: Gestão de pets
         When method post
         Then status 200
         And match response == "#object"
-        And match response contains { code: 200, type: "unknown", message: "#(petId)" }
+        And match response contains { code: 200, type: "unknown" }
+        * def message = response.message
+        And assert parseInt(message) == petId
 
     Scenario: Consultar pet por status available e pending
         * def responseCodeEsperado = 200
@@ -36,4 +45,12 @@ Feature: Gestão de pets
         Given request payload
         When method post
         Then status 200
+
+    Scenario: Cadastrar um novo pet  com id aleatório
+        * def payload = { id: 0, category: { id: 0, name: "string" }, name: "doggie", photoUrls: [], tags: [], status: "available" }
+        Given request payload
+        When method post
+        Then status 200
+        * def idDoPet = response.id
+        * print idDoPet
 
